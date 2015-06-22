@@ -200,8 +200,7 @@ function cpc_get_featured_brokers( $instance ) {
 	$type = $instance['user'];
 
 	// If not using the ClassiPress theme, don't display the Widget
-	$my_theme = wp_get_theme();
-	if( !($my_theme->get( 'Name' ) == 'ClassiPress' || $my_theme->get( 'Template' ) == 'classipress' )){
+	if( !cpc_using_classipress() ){
 		?>
 		<style>
 		.widget_broker_widget {

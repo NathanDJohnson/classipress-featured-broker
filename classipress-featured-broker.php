@@ -187,30 +187,6 @@ function cpc_using_classipress() {
 }
 
 function cpc_list_brokers() {
-
-}
-
-function cpc_broker_list_shortcode() {
-
-}
-
-function cpc_get_featured_brokers( $instance ) {	
-
-	global $wpdb, $current_user;
-	$type = $instance['user'];
-
-	// If not using the ClassiPress theme, don't display the Widget
-	if( !cpc_using_classipress() ){
-		?>
-		<style>
-		.widget_broker_widget {
-			display: none !important;
-		}
-		</style>
-		<?php
-		return;
-	}
-	
 	// If ClassiPress More Memberships plugin is used
 	if( function_exists('ukljuci_ad_limit_jms') ) {
 		// This plugin introduces a different way to handle Memberships
@@ -235,7 +211,31 @@ function cpc_get_featured_brokers( $instance ) {
 	);
 
 	// The Query
-	$user_query = new WP_User_Query( $args );
+	return new WP_User_Query( $args );
+}
+
+function cpc_broker_list_shortcode() {
+
+}
+
+function cpc_get_featured_brokers( $instance ) {	
+
+	global $wpdb, $current_user;
+	$type = $instance['user'];
+
+	// If not using the ClassiPress theme, don't display the Widget
+	if( !cpc_using_classipress() ){
+		?>
+		<style>
+		.widget_broker_widget {
+			display: none !important;
+		}
+		</style>
+		<?php
+		return;
+	}
+	
+	$user_query = cpc_list_brokers();
 	
 	$count = count( $user_query->results);
 	$number = rand(0,$count-1);

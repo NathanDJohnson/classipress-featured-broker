@@ -186,7 +186,7 @@ function cpc_using_classipress() {
 	return true;
 }
 
-function cpc_list_brokers() {
+function cpc_list_brokers( $type ) {
 	// If ClassiPress More Memberships plugin is used
 	if( function_exists('ukljuci_ad_limit_jms') ) {
 		// This plugin introduces a different way to handle Memberships
@@ -214,8 +214,80 @@ function cpc_list_brokers() {
 	return new WP_User_Query( $args );
 }
 
-function cpc_broker_list_shortcode() {
+function cpc_broker_list_shortcode( $atts ) {
+	$a = shortcode_atts( array(
+		'type' => ''
+	), $atts );
+	
+	// For now, show all users!
+	$type = "";
+	
+	$user_query = cpc_list_brokers( $type );
+	
+	if( $user_query->results ){
+		ob_start();
+		foreach( $user_query->results as $user){
+			$imgURL = cpc_broker_img_url( $user->ID );
+			?>
 
+<a class="broker-list-link" href="<?php echo site_url();?>/author/<?php echo $user->user_nicename;?>/">
+	<div class="broker-ind-wrapper">
+		<div class="broker-list-image">
+			<figure class="broker-content"><img src="<?php echo $imgURL; ?>" class="" alt="" /></figure>
+		</div>
+		<div class="broker-list-desc">
+			<h3 class="broker-list-header"><?php echo $user->display_name;?></h3>
+			<p><?php echo strip_tags( get_the_author_meta( 'description', $user->ID ) ); ?></p>
+			<p class="broker-list-tag">Listings: <?php echo cpc_broker_listings( $user->ID )?></p>
+		</div>
+	</div><!-- .broker-wrapper -->
+</a>
+			<?php
+		}
+	}
+	?>
+	<style>
+		.broker-ind-wrapper {
+			margin: 5px auto;
+			clear: both;
+			overflow: hidden;
+		}
+		.broker-ind-wrapper:hover {
+			opacity: 0.8;
+			background: #eee;
+		}
+		.broker-list-image {
+			float: left;
+			width: 130px;
+		}
+		.broker-list-desc {
+			float: right;
+			margin: 10px;
+			width: calc( 100% - 170px );
+		}
+		.broker-content {
+			padding: 0;
+			margin: 10px;
+		}
+	</style><?php
+	return ob_get_clean();
+}
+add_shortcode( 'brokers', 'cpc_broker_list_shortcode' );
+
+/**
+ * Helper function
+ */
+function cpc_broker_img_url( $userID ){
+	/* This function is dependent upon the WP User Avatar plugin! */
+	if( function_exists('get_wp_user_avatar_src') ) {
+		return get_wp_user_avatar_src($userID, 250);
+	}
+	elseif( function_exists('get_avatar_url') ) {
+		return get_avatar_url($userID);
+	}
+	else{
+		return;
+	}
 }
 
 function cpc_get_featured_brokers( $instance ) {	
@@ -224,7 +296,7 @@ function cpc_get_featured_brokers( $instance ) {
 	$type = $instance['user'];
 
 	// If not using the ClassiPress theme, don't display the Widget
-	if( !cpc_using_classipress() ){
+	if( !cpc_using_classipress( ) ){
 		?>
 		<style>
 		.widget_broker_widget {
@@ -235,24 +307,13 @@ function cpc_get_featured_brokers( $instance ) {
 		return;
 	}
 	
-	$user_query = cpc_list_brokers();
+	$user_query = cpc_list_brokers( $type );
 
 	if ( ! empty( $user_query->results ) ) {
 		// select a random user
 		$num = rand( 0, count( $user_query->results )-1 );
 		$results = $user_query->results;
 		$user = $results[$num];
-
-		/* This function is dependent upon the WP User Avatar plugin! */
-		if( function_exists('get_wp_user_avatar_src') ) {
-			$imgURL = get_wp_user_avatar_src($user->ID, 250);
-		}
-		elseif( function_exists('get_avatar_url') ) {
-			$imgURL = get_avatar_url($user->ID);
-		}
-		else{
-			$imgURL = '';
-		}
 ?>
 <div class="broker-wrapper">
 	<ul class="slide">
@@ -260,7 +321,7 @@ function cpc_get_featured_brokers( $instance ) {
 			<a class="featured-broker-header" href="<?php echo site_url();?>/author/<?php echo $user->user_nicename;?>/">
 				<h3 class="broker-header"><?php echo $user->display_name;?></h3>
 				<figure class="broker-content">
-					<img width="400" height="244" src="<?php echo $imgURL; ?>" class="attachment-bsc_featured" alt="" />
+					<img width="400" height="244" src="<?php echo cpc_broker_img_url( $user->ID ); ?>" class="attachment-bsc_featured" alt="" />
 					<figcaption><p><?php echo strip_tags( get_the_author_meta( 'description', $user->ID ) ); ?></p></figcaption>
 				</figure>
 			<p class="broker-tag">Listings: <?php echo cpc_broker_listings( $user->ID )?></p>

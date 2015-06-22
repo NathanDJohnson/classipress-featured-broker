@@ -236,45 +236,38 @@ function cpc_get_featured_brokers( $instance ) {
 	}
 	
 	$user_query = cpc_list_brokers();
-	
-	$count = count( $user_query->results);
-	$number = rand(0,$count-1);
-	
-	$n=0;
-	// User Loop - display 1 random user
-	if ( ! empty( $user_query->results ) ) {
-			foreach ( $user_query->results as $user ) { 
-				if( $n == $number ){
 
-						/* This function is dependent upon the WP User Avatar plugin! */
-						if( function_exists('get_wp_user_avatar_src') ) {
-							$imgURL = get_wp_user_avatar_src($user->ID, 250);
-						}
-						elseif( function_exists('get_avatar_url') ) {
-							$imgURL = get_avatar_url($user->ID);
-						}
-						else{
-							$imgURL = '';
-						}
-					  
-					?>
-					<div class="broker-wrapper">
-						<ul class="slide">
-							<li>
-								<a class="featured-broker-header" href="<?php echo site_url();?>/author/<?php echo $user->user_nicename;?>/">
-									<h3 class="broker-header"><?php echo $user->display_name;?></h3>
-									<figure class="broker-content">
-										<img width="400" height="244" src="<?php echo $imgURL; ?>" class="attachment-bsc_featured" alt="" />
-										<figcaption><p><?php echo strip_tags( get_the_author_meta( 'description', $user->ID ) ); ?></p></figcaption>
-									</figure>
-								<p class="broker-tag">Listings: <?php echo cpc_broker_listings( $user->ID )?></p>
-								</a>
-							</li>            
-						</ul>
-					</div>
-			<?php
-				}
-				$n=$n+1;
-			}
+	if ( ! empty( $user_query->results ) ) {
+		// select a random user
+		$num = rand( 0, count( $user_query->results )-1 );
+		$results = $user_query->results;
+		$user = $results[$num];
+
+		/* This function is dependent upon the WP User Avatar plugin! */
+		if( function_exists('get_wp_user_avatar_src') ) {
+			$imgURL = get_wp_user_avatar_src($user->ID, 250);
+		}
+		elseif( function_exists('get_avatar_url') ) {
+			$imgURL = get_avatar_url($user->ID);
+		}
+		else{
+			$imgURL = '';
+		}
+?>
+<div class="broker-wrapper">
+	<ul class="slide">
+		<li>
+			<a class="featured-broker-header" href="<?php echo site_url();?>/author/<?php echo $user->user_nicename;?>/">
+				<h3 class="broker-header"><?php echo $user->display_name;?></h3>
+				<figure class="broker-content">
+					<img width="400" height="244" src="<?php echo $imgURL; ?>" class="attachment-bsc_featured" alt="" />
+					<figcaption><p><?php echo strip_tags( get_the_author_meta( 'description', $user->ID ) ); ?></p></figcaption>
+				</figure>
+			<p class="broker-tag">Listings: <?php echo cpc_broker_listings( $user->ID )?></p>
+			</a>
+		</li>            
+	</ul>
+</div>
+	<?php
 	}
 }

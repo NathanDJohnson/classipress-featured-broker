@@ -176,6 +176,9 @@ function cpc_broker_listings( $theuser ){
 	return false;
 }
 
+/**
+ * Returns unordered list of images for ad listings for the user
+ */
 function cpc_broker_list_image( $theuser ){
 
 	global $cp_options;
@@ -198,7 +201,7 @@ function cpc_broker_list_image( $theuser ){
 			<li>
 				<h3><?php echo the_title(); ?></h3>
 				<?php if ( $cp_options->ad_images ) cp_ad_loop_thumbnail(); ?>
-				<p><?php echo the_excerpt();?></p>
+				<p><?php //echo the_excerpt();?></p>
 			</li>
 		<?php } ?>
 		</ul>
@@ -211,6 +214,9 @@ function cpc_broker_list_image( $theuser ){
 	return ob_get_clean();
 }
 
+/**
+ * Returns true if ClassiPress is used as a theme or parent theme
+ */
 function cpc_using_classipress() {
 
 	// Test if using the ClassiPress theme or child theme
@@ -261,11 +267,12 @@ function cpc_broker_list_shortcode( $atts ) {
 	
 	if( $user_query->results ){
 		ob_start();
+?><ul><?php
 		foreach( $user_query->results as $user){
 			$imgURL = cpc_broker_img_url( $user->ID );
 			?>
 
-<div class="broker-ind-wrapper">
+<li class="broker-ind-wrapper">
 	<a class="broker-list-link" href="<?php echo site_url();?>/author/<?php echo $user->user_nicename;?>/">
 		<div class="broker-list-image">
 			<figure class="broker-content"><img src="<?php echo $imgURL; ?>" class="" alt="" /></figure>
@@ -277,25 +284,34 @@ function cpc_broker_list_shortcode( $atts ) {
 		</div>
 	</a>
 	<div class="broker-list-listings">
-		<h3>Listings:</h3>
+		<h3>Listings</h3>
 		<?php
 			echo cpc_broker_list_image( $user->ID );
 		?>
 	</div>
-</div><!-- .broker-wrapper -->
+</li><!-- .broker-wrapper -->
 			<?php
 		}
 	}
 	?>
+</ul>
 	<style>
 		.broker-ind-wrapper {
 			margin: 5px auto;
 			clear: both;
 			overflow: hidden;
+			background-color: #eee;
+		}
+		ul li.broker-ind-wrapper:nth-child(2n) {  
+			background-color: #ddd;
 		}
 		.broker-ind-wrapper:hover {
 			opacity: 0.8;
-			background: #eee;
+			background: #ddd;
+		}
+		ul li.broker-ind-wrapper:nth-child(2n):hover { 
+			opacity: 0.8;
+			background-color: #eee;
 		}
 		.broker-list-image {
 			float: left;
@@ -312,12 +328,18 @@ function cpc_broker_list_shortcode( $atts ) {
 		}
 		.broker-list-listings {
 			clear: both;
-			margin-left: 170px;
-			border-top: 1px solid #aaa;
 			padding-top: 15px;
+		}
+		.broker-list-listings h3 {
+			text-align:center;
 		}
 		.broker-list-listings ul li {
 			clear: both;
+			list-style: none;
+			display: inline-block;
+			margin: 5px;
+			width: 95px;
+			text-align: center;
 		}
 	</style><?php
 	return ob_get_clean();
@@ -325,7 +347,7 @@ function cpc_broker_list_shortcode( $atts ) {
 add_shortcode( 'brokers', 'cpc_broker_list_shortcode' );
 
 /**
- * Helper function
+ * Helper function to get an image corresponding to a user
  */
 function cpc_broker_img_url( $userID ){
 	/* This function is dependent upon the WP User Avatar plugin! */

@@ -199,9 +199,8 @@ function cpc_broker_list_image( $theuser ){
 		<?php while ( $author_query->have_posts() ) {
 			$author_query->the_post(); ?>
 			<li>
-				<h3><?php echo the_title(); ?></h3>
+				<a href="<?php echo the_permalink(); ?>"><h4><?php echo the_title(); ?></h4></a>
 				<?php if ( $cp_options->ad_images ) cp_ad_loop_thumbnail(); ?>
-				<p><?php //echo the_excerpt();?></p>
 			</li>
 		<?php } ?>
 		</ul>
@@ -212,6 +211,16 @@ function cpc_broker_list_image( $theuser ){
 	/* Restore original Post Data */
 	wp_reset_postdata();
 	return ob_get_clean();
+}
+
+/**
+ * Returns true if user is featured
+ */
+function cpc_is_featured( $userID, $featuredtype ){
+	if( get_user_meta( $userID, 'active_membership_pack' ) == array( $featuredtype ) ){
+		return true;
+	}
+	return false;
 }
 
 /**
@@ -274,7 +283,7 @@ function cpc_broker_list_shortcode( $atts ) {
 			$imgURL = cpc_broker_img_url( $user->ID );
 			?>
 
-<li class="broker-ind-wrapper<?php if( get_user_meta( $user->ID, 'active_membership_pack' ) == array('Broker') ) {echo ' featured';}?>"> 
+<li class="broker-ind-wrapper<?php if( cpc_is_featured( $user->ID, 'Broker' )){echo ' featured';}?>"> 
 	<a class="broker-list-link" href="<?php echo site_url();?>/author/<?php echo $user->user_nicename;?>/">
 		<div class="broker-list-image">
 			<figure class="broker-content"><img src="<?php echo $imgURL; ?>" class="" alt="" /></figure>
@@ -282,11 +291,14 @@ function cpc_broker_list_shortcode( $atts ) {
 		<div class="broker-list-desc">
 			<h3 class="broker-list-header"><?php echo $user->display_name;?></h3>
 			<p><?php echo strip_tags( get_the_author_meta( 'description', $user->ID ) ); ?></p>
-			<!-- <p class="broker-list-tag">Listings: <?php echo cpc_broker_listings( $user->ID )?></p>-->
+			<?php if( cpc_is_featured( $user->ID, 'Broker' )){ ?>
+			<p class="broker-list-featured"><a href="/featured/">Featured Broker</a></p>
+			<?php }?>
+
 		</div>
 	</a>
 	<div class="broker-list-listings">
-		<h3>Listings</h3>
+		<a href="<?php echo site_url();?>/author/<?php echo $user->user_nicename;?>/"><h3>Listings</h3></a>
 		<?php
 			echo cpc_broker_list_image( $user->ID );
 		?>
@@ -298,6 +310,9 @@ function cpc_broker_list_shortcode( $atts ) {
 	?>
 </ul>
 	<style>
+		a {
+			text-decoration: none;
+		}
 		.broker-ind-wrapper {
 			margin: 5px auto;
 			clear: both;
@@ -315,12 +330,14 @@ function cpc_broker_list_shortcode( $atts ) {
 			opacity: 0.8;
 			background-color: #eee;
 		}
+		.broker-ind-wrapper ul {
+			padding-left: 0;
+		}
 		ul li.broker-ind-wrapper.featured {
-			border-top: 1px solid rgb(0, 80, 135);
-			border-left: 1px solid rgb(0, 80, 135);
+			border: 1px solid rgb(0, 80, 135);
 			border-radius: 5px;
-			box-shadow: rgb(0, 80, 135) 2px 2px;
-			margin-bottom: 7px;
+			background-color: #91c5e1;
+			list-style-type: none;
 		}
 		.broker-list-image {
 			float: left;
@@ -338,10 +355,26 @@ function cpc_broker_list_shortcode( $atts ) {
 		.broker-list-listings {
 			clear: both;
 			padding-top: 15px;
+			margin: 0 auto;
+			text-align: center;
 		}
 		.broker-list-listings h3 {
 			text-align:center;
+			padding-bottom: 3px;
 		}
+		.broker-list-listings a {
+			text-decoration: none;
+		}
+		.broker-list-listings a h3 {
+			font-size: 1.2em;
+			color: #005087;
+			padding-bottom: 5px;
+			border-bottom: 1px dotted #3f8223;
+		}
+		.broker-list-listings h4 {
+			padding: 0;
+ 			margin: 0;
+  		}
 		.broker-list-listings ul li {
 			clear: both;
 			list-style: none;
@@ -349,6 +382,11 @@ function cpc_broker_list_shortcode( $atts ) {
 			margin: 5px;
 			width: 95px;
 			text-align: center;
+		}
+		.broker-list-featured a {
+			color: red;
+			font-size: 1.2em;
+			font-weight: bold;
 		}
 	</style><?php
 	return ob_get_clean();

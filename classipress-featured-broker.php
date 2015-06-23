@@ -229,8 +229,8 @@ function cpc_using_classipress() {
 
 function cpc_list_brokers( $type ) {
 	// If ClassiPress More Memberships plugin is used
+	// This plugin introduces a different way to handle Memberships
 	if( function_exists('ukljuci_ad_limit_jms') ) {
-		// This plugin introduces a different way to handle Memberships
 		$sql = "	SELECT  `ID` 
 					FROM  `$wpdb->posts` 
 					WHERE  `post_title` =  '$type'
@@ -248,7 +248,9 @@ function cpc_list_brokers( $type ) {
 	
 	$args = array(
 		'meta_key' => 'active_membership_pack', 
-		'meta_value' => $pack_id
+		'meta_value' => $pack_id,
+		'orderby' => 'display_name', 
+		'order' => 'ASC'
 	);
 
 	// The Query
@@ -272,7 +274,7 @@ function cpc_broker_list_shortcode( $atts ) {
 			$imgURL = cpc_broker_img_url( $user->ID );
 			?>
 
-<li class="broker-ind-wrapper">
+<li class="broker-ind-wrapper<?php if( get_user_meta( $user->ID, 'active_membership_pack' ) == array('Broker') ) {echo ' featured';}?>"> 
 	<a class="broker-list-link" href="<?php echo site_url();?>/author/<?php echo $user->user_nicename;?>/">
 		<div class="broker-list-image">
 			<figure class="broker-content"><img src="<?php echo $imgURL; ?>" class="" alt="" /></figure>
@@ -312,6 +314,13 @@ function cpc_broker_list_shortcode( $atts ) {
 		ul li.broker-ind-wrapper:nth-child(2n):hover { 
 			opacity: 0.8;
 			background-color: #eee;
+		}
+		ul li.broker-ind-wrapper.featured {
+			border-top: 1px solid rgb(0, 80, 135);
+			border-left: 1px solid rgb(0, 80, 135);
+			border-radius: 5px;
+			box-shadow: rgb(0, 80, 135) 2px 2px;
+			margin-bottom: 7px;
 		}
 		.broker-list-image {
 			float: left;

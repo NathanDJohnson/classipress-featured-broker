@@ -176,6 +176,41 @@ function cpc_broker_listings( $theuser ){
 	return false;
 }
 
+function cpc_broker_list_image( $theuser ){
+
+	global $cp_options;
+	
+	// args
+	$args = array(
+		'author'=>$theuser,
+		'post_type' => array( 'ad_listing' )
+	);
+	
+	// The Query
+	$author_query = new WP_Query( $args );
+	
+	// The Loop
+	if ( $author_query->have_posts() ) {
+		ob_start(); ?>
+		<ul>
+		<?php while ( $author_query->have_posts() ) {
+			$author_query->the_post(); ?>
+			<li>
+				<h3><?php echo the_title(); ?></h3>
+				<?php if ( $cp_options->ad_images ) cp_ad_loop_thumbnail(); ?>
+				<p><?php echo the_excerpt();?></p>
+			</li>
+		<?php } ?>
+		</ul>
+	<?php
+	} else {
+		// no posts found
+	}
+	/* Restore original Post Data */
+	wp_reset_postdata();
+	return ob_get_clean();
+}
+
 function cpc_using_classipress() {
 
 	// Test if using the ClassiPress theme or child theme
@@ -230,18 +265,24 @@ function cpc_broker_list_shortcode( $atts ) {
 			$imgURL = cpc_broker_img_url( $user->ID );
 			?>
 
-<a class="broker-list-link" href="<?php echo site_url();?>/author/<?php echo $user->user_nicename;?>/">
-	<div class="broker-ind-wrapper">
+<div class="broker-ind-wrapper">
+	<a class="broker-list-link" href="<?php echo site_url();?>/author/<?php echo $user->user_nicename;?>/">
 		<div class="broker-list-image">
 			<figure class="broker-content"><img src="<?php echo $imgURL; ?>" class="" alt="" /></figure>
 		</div>
 		<div class="broker-list-desc">
 			<h3 class="broker-list-header"><?php echo $user->display_name;?></h3>
 			<p><?php echo strip_tags( get_the_author_meta( 'description', $user->ID ) ); ?></p>
-			<p class="broker-list-tag">Listings: <?php echo cpc_broker_listings( $user->ID )?></p>
+			<!-- <p class="broker-list-tag">Listings: <?php echo cpc_broker_listings( $user->ID )?></p>-->
 		</div>
-	</div><!-- .broker-wrapper -->
-</a>
+	</a>
+	<div class="broker-list-listings">
+		<h3>Listings:</h3>
+		<?php
+			echo cpc_broker_list_image( $user->ID );
+		?>
+	</div>
+</div><!-- .broker-wrapper -->
 			<?php
 		}
 	}
@@ -268,6 +309,15 @@ function cpc_broker_list_shortcode( $atts ) {
 		.broker-content {
 			padding: 0;
 			margin: 10px;
+		}
+		.broker-list-listings {
+			clear: both;
+			margin-left: 170px;
+			border-top: 1px solid #aaa;
+			padding-top: 15px;
+		}
+		.broker-list-listings ul li {
+			clear: both;
 		}
 	</style><?php
 	return ob_get_clean();

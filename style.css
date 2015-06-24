@@ -184,3 +184,7 @@
 			font-size: 1.2em;
 			font-weight: bold;
 		}
+		.broker-list-image .broker-content img {
+			height: 120px;
+			width: 120px;
+		}

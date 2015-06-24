@@ -237,6 +237,8 @@ function cpc_using_classipress() {
 }
 
 function cpc_list_brokers( $type ) {
+	global $wpdb;
+	
 	// If ClassiPress More Memberships plugin is used
 	// This plugin introduces a different way to handle Memberships
 	if( function_exists('ukljuci_ad_limit_jms') ) {
@@ -348,7 +350,7 @@ function cpc_get_featured_brokers( $instance ) {
 	}
 	
 	$user_query = cpc_list_brokers( $type );
-
+		
 	if ( ! empty( $user_query->results ) ) {
 		// select a random user
 		$num = rand( 0, count( $user_query->results )-1 );

@@ -238,7 +238,7 @@ function cpc_using_classipress() {
 
 function cpc_list_brokers( $type ) {
 	global $wpdb;
-	
+
 	// If ClassiPress More Memberships plugin is used
 	// This plugin introduces a different way to handle Memberships
 	if( function_exists('ukljuci_ad_limit_jms') ) {
@@ -256,7 +256,7 @@ function cpc_list_brokers( $type ) {
 		// Since the plugin isn't installed, just use the default value
 		$pack_id = $type;
 	}
-	
+
 	$args = array(
 		'meta_key' => 'active_membership_pack', 
 		'meta_value' => $pack_id,
@@ -269,12 +269,13 @@ function cpc_list_brokers( $type ) {
 }
 
 function cpc_broker_list_shortcode( $atts ) {
+	wp_enqueue_style( 'featured-broker', plugin_dir_url( __FILE__ ) . 'style.css' );
 	$a = shortcode_atts( array(
 		'type' => ''
 	), $atts );
 	
 	// For now, show all users!
-	$type = "";
+	$type = "Featured Broker";
 	
 	$user_query = cpc_list_brokers( $type );
 	

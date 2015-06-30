@@ -236,7 +236,7 @@ function cpc_using_classipress() {
 	return true;
 }
 
-function cpc_list_brokers( $type ) {
+function cpc_list_brokers( $type, $state = '' ) {
 	global $wpdb;
 
 	// If ClassiPress More Memberships plugin is used
@@ -257,12 +257,31 @@ function cpc_list_brokers( $type ) {
 		$pack_id = $type;
 	}
 
+	if( $state ){
 	$args = array(
-		'meta_key' => 'active_membership_pack', 
-		'meta_value' => $pack_id,
+		'meta_query' => array(
+			'relation' => 'AND',
+			array(
+				'key'     => 'active_membership_pack',
+				'value'   => $pack_id
+			),
+			array(
+				'key'     => 'user_state',
+				'value'   => 'Colorado'
+			)
+		),
 		'orderby' => 'display_name', 
 		'order' => 'ASC'
-	);
+		);
+	}
+	else {
+	$args = array(
+			'meta_key' => 'active_membership_pack', 
+			'meta_value' => $pack_id,
+			'orderby' => 'display_name', 
+			'order' => 'ASC'
+		);
+	}
 
 	// The Query
 	return new WP_User_Query( $args );
@@ -271,13 +290,11 @@ function cpc_list_brokers( $type ) {
 function cpc_broker_list_shortcode( $atts ) {
 	wp_enqueue_style( 'featured-broker', plugin_dir_url( __FILE__ ) . 'style.css' );
 	$a = shortcode_atts( array(
-		'type' => ''
+		'type' => '',
+		'state' => '',
 	), $atts );
-	
-	// For now, show all users!
-	$type = "Featured Broker";
-	
-	$user_query = cpc_list_brokers( $type );
+
+	$user_query = cpc_list_brokers( $a['type'], $a['state'] );
 	
 	if( $user_query->results ){
 		ob_start();

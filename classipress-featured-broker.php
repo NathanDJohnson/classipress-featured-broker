@@ -317,12 +317,13 @@ function cpc_broker_list_shortcode( $atts ) {
 
 		</div>
 	</a>
+	<!--
 	<div class="broker-list-listings">
 		<a href="<?php echo site_url();?>/author/<?php echo $user->user_nicename;?>/"><h3>Listings</h3></a>
 		<?php
-			echo cpc_broker_list_image( $user->ID );
+			//echo cpc_broker_list_image( $user->ID );
 		?>
-	</div>
+	</div>-->
 </li><!-- .broker-wrapper -->
 			<?php
 		}
@@ -333,6 +334,43 @@ function cpc_broker_list_shortcode( $atts ) {
 	return ob_get_clean();
 }
 add_shortcode( 'brokers', 'cpc_broker_list_shortcode' );
+
+function cpc_get_cp_state(){
+	global $wpdb;
+	$sql = $wpdb->prepare( 
+		"
+			SELECT `field_values` 
+			FROM `$wpdb->cp_ad_fields` 
+			WHERE `field_name`='cp_state'
+		", $meta_key
+	);
+	return explode(',',$wpdb->get_var( $sql ));
+}
+
+function cpc_broker_directory_shortcode( $atts ) {
+	$a = shortcode_atts( array(
+		'dir' => '',
+	), $atts );
+	
+	 $states = cpc_get_cp_state();
+	 ob_start();
+	 ?>
+	 <div id="broker-directory-wrapper">
+	 <h2>Browse Brokers by State</h2>
+	 <ul id="broker-directory">
+	 <?php	 
+	 foreach( $states as $state ){
+	 	?>
+	 	<li class="broker-directory-<?php echo strtolower(str_replace(' ', '_', $state)); ?>"><a href="<?php if($a['dir']){ echo $a['dir']."/"; }; ?><?php echo strtolower(str_replace(' ', '_', $state)); ?>/"><?php echo $state; ?></a></li>
+	 <?php
+	 }
+	 ?>
+	 </ul>
+	 </div>
+	 <?php
+	 return ob_get_clean();
+}
+add_shortcode( 'broker-directory', 'cpc_broker_directory_shortcode' );
 
 /**
  * Helper function to get an image corresponding to a user

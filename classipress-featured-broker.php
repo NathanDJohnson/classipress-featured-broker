@@ -295,10 +295,10 @@ function cpc_broker_list_shortcode( $atts ) {
 	), $atts );
 
 	$user_query = cpc_list_brokers( $a['type'], $a['state'] );
-	
+
+	ob_start();
+	?><ul id="broker-list-broker"><?php
 	if( $user_query->results ){
-		ob_start();
-?><ul><?php
 		foreach( $user_query->results as $user){
 			$imgURL = cpc_broker_img_url( $user->ID );
 			?>

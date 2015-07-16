@@ -390,8 +390,8 @@ function cpc_broker_img_url( $userID ){
 function cpc_get_featured_brokers( $instance ) {	
 
 	global $wpdb, $current_user;
-	$type = $instance['user'];
-	$number = $instance['number'];
+	$type = esc_html( $instance['user'] );
+	$number = esc_html( $instance['number'] );
 	if( !is_numeric( $number ) || $number < 0 ) { $number = 4; } //default
 
 	// If not using the ClassiPress theme, don't display the Widget
@@ -411,6 +411,8 @@ function cpc_get_featured_brokers( $instance ) {
 	if ( ! empty( $user_query->results ) ) {
 		$random = $user_query->results;
 		shuffle( $random );
+		if( $number > count( $random ) ) { $number = count( $random ); }
+		$random = array_slice( $random, 0, $number );
 ?>		
 <div id="classipress-featured-brokers">	
 <?php

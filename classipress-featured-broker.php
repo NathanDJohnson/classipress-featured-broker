@@ -54,10 +54,15 @@ class Broker_Widget extends WP_Widget {
 	public function form( $instance ) {
 		$title = ! empty( $instance['title'] ) ? $instance['title'] : __( 'Featured Broker', 'text_domain' );
 		$user = ! empty( $instance['user'] ) ? $instance['user'] : __( '', 'text_domain' );
+		$number = ! empty( $instance['number'] ) ? $instance['number'] : __( '', 'text_domain' );
 		?>
 		<p>
 		<label for="<?php echo $this->get_field_id( 'title' ); ?>"><?php _e( 'Title:' ); ?></label> 
 		<input class="widefat" id="<?php echo $this->get_field_id( 'title' ); ?>" name="<?php echo $this->get_field_name( 'title' ); ?>" type="text" value="<?php echo esc_attr( $title ); ?>">
+		</p>
+		<p>
+		<label for="<?php echo $this->get_field_id( 'number' ); ?>"><?php _e( 'Number:' ); ?></label> 
+		<input class="widefat" id="<?php echo $this->get_field_id( 'number' ); ?>" name="<?php echo $this->get_field_name( 'number' ); ?>" type="text" value="<?php echo esc_attr( $number ); ?>">
 		</p>
 
 <!-- select membership group -->
@@ -101,6 +106,7 @@ class Broker_Widget extends WP_Widget {
 		$instance = array();
 		$instance['title'] = ( ! empty( $new_instance['title'] ) ) ? strip_tags( $new_instance['title'] ) : '';
 		$instance['user'] = ( ! empty( $new_instance['user'] ) ) ? strip_tags( $new_instance['user'] ) : '';
+		$instance['number'] = ( ! empty( $new_instance['number'] ) ) ? strip_tags( $new_instance['number'] ) : '';
 
 		return $instance;
 	}
@@ -173,7 +179,7 @@ function cpc_broker_listings( $theuser ){
 	if( $author_total->have_posts() ){
 		return count( $author_total->posts );
 	}
-	return false;
+	return 0;
 }
 
 /**
@@ -317,13 +323,6 @@ function cpc_broker_list_shortcode( $atts ) {
 
 		</div>
 	</a>
-	<!--
-	<div class="broker-list-listings">
-		<a href="<?php echo site_url();?>/author/<?php echo $user->user_nicename;?>/"><h3>Listings</h3></a>
-		<?php
-			//echo cpc_broker_list_image( $user->ID );
-		?>
-	</div>-->
 </li><!-- .broker-wrapper -->
 			<?php
 		}
@@ -392,6 +391,8 @@ function cpc_get_featured_brokers( $instance ) {
 
 	global $wpdb, $current_user;
 	$type = $instance['user'];
+	$number = $instance['number'];
+	if( !is_numeric( $number ) || $number < 0 ) { $number = 4; } //default
 
 	// If not using the ClassiPress theme, don't display the Widget
 	if( !cpc_using_classipress( ) ){
@@ -408,25 +409,31 @@ function cpc_get_featured_brokers( $instance ) {
 	$user_query = cpc_list_brokers( $type );
 		
 	if ( ! empty( $user_query->results ) ) {
-		// select a random user
-		$num = rand( 0, count( $user_query->results )-1 );
-		$results = $user_query->results;
-		$user = $results[$num];
+		$random = $user_query->results;
+		shuffle( $random );
+?>		
+<div id="classipress-featured-brokers">	
+<?php
+		foreach( $random as $user ){
 ?>
 <div class="broker-wrapper">
-	<ul class="slide">
-		<li>
-			<a class="featured-broker-header" href="<?php echo site_url();?>/author/<?php echo $user->user_nicename;?>/">
-				<h3 class="broker-header"><?php echo $user->display_name;?></h3>
-				<figure class="broker-content">
-					<img width="400" height="244" src="<?php echo cpc_broker_img_url( $user->ID ); ?>" class="attachment-bsc_featured" alt="" />
-					<figcaption><p><?php echo strip_tags( get_the_author_meta( 'description', $user->ID ) ); ?></p></figcaption>
-				</figure>
-			<p class="broker-tag">Listings: <?php echo cpc_broker_listings( $user->ID )?></p>
-			</a>
-		</li>            
-	</ul>
-</div>
+<ul class="slide">
+<li>
+<a class="featured-broker-header" href="<?php echo site_url();?>/author/<?php echo $user->user_nicename;?>/">
+<h3 class="broker-header"><?php echo $user->display_name;?></h3>
+<figure class="broker-content">
+<img width="400" height="244" src="<?php echo cpc_broker_img_url( $user->ID ); ?>" class="attachment-bsc_featured" alt="" />
+<figcaption><p><?php echo strip_tags( get_the_author_meta( 'description', $user->ID ) ); ?></p></figcaption>
+</figure>
+<p class="broker-tag">Listings: <?php echo cpc_broker_listings( $user->ID )?></p>
+</a>
+</li>            
+</ul>
+</div><!-- .broker-wrapper -->
+<?php		
+		}
+?>
+</div><!-- #classipress-featured-brokers -->
 	<?php
 	}
 }

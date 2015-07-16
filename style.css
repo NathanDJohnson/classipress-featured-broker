@@ -80,6 +80,17 @@
 	z-index: 100;
 }
 
+/* #classipress-featured-brokers
+***********************/
+#classipress-featured-brokers {
+	text-align:center;
+	margin:10px 0;
+}
+.broker-wrapper {
+	display:inline-block;
+	margin:0 3px;
+}
+
 /* Broker tag
 ***********************/
 .broker-tag {

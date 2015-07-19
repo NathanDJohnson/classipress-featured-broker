@@ -293,6 +293,12 @@ function cpc_list_brokers( $type, $state = '' ) {
 	return new WP_User_Query( $args );
 }
 
+/**
+ * This shortcode takes two parameters (both optional) and returns html displaying the results and an unordered list
+ * param: type
+ * param: state
+ * return: html list
+ */
 function cpc_broker_list_shortcode( $atts ) {
 	wp_enqueue_style( 'featured-broker', plugin_dir_url( __FILE__ ) . 'style.css' );
 	$a = shortcode_atts( array(
@@ -301,18 +307,17 @@ function cpc_broker_list_shortcode( $atts ) {
 	), $atts );
 
 	$user_query = cpc_list_brokers( $a['type'], $a['state'] );
-	
-	if( !$user_query-> results ){ return; }
-
-	ob_start();
 	?>
-	<h2 style="text-align: center; margin-top: 0.5em;"><?php echo $a['type'];?></h2>
-	<ul id="broker-list-broker"><?php
+	<?php ob_start(); ?>
+	<h2 style="text-align: center; margin-top: 0.5em;"><?php echo $a['type'];?>s</h2>
+	<?php if( $user_query-> results ) : ?>
+
+<ul class="broker-list-broker">
+	<?php
 	if( $user_query->results ){
 		foreach( $user_query->results as $user){
 			$imgURL = cpc_broker_img_url( $user->ID );
 			?>
-
 <li class="broker-ind-wrapper<?php if( cpc_is_featured( $user->ID, 'Broker' )){echo ' featured';}?>"> 
 	<a class="broker-list-link" href="<?php echo site_url();?>/author/<?php echo $user->user_nicename;?>/">
 		<div class="broker-list-image">
@@ -329,15 +334,29 @@ function cpc_broker_list_shortcode( $atts ) {
 	</a>
 </li><!-- .broker-wrapper -->
 			<?php
-		}
-	}
+		} // end foreach
+	} // end if
 	?>
-</ul>
-	<?php
-	return ob_get_clean();
+</ul> <!-- .broker-list-broker -->
+	<?php else : ?>
+	<p class="no-results">No <?php echo strtolower( $a['type'] ); ?>s found<?php if($a['state']){echo " in ".$a['state'];}?>.</p>
+	<?php endif; ?>
+	<?php return ob_get_clean(); ?>
+<?php
 }
 add_shortcode( 'brokers', 'cpc_broker_list_shortcode' );
 
+/**
+ * Default State List
+ */
+function cpc_default_state_list() {
+	return 'Alabama,Alaska,Arizona,Arkansas,California,Colorado,Connecticut,Delaware,Florida,Georgia,Hawaii,Idaho,Illinois,Indiana,Iowa,Kansas,Kentucky,Louisiana,Maine,Maryland,Massachusetts,Michigan,Minnesota,Mississippi,Missouri,Montana Nebraska,Nevada,New Hampshire,New Jersey,New Mexico,New York,North Carolina,North Dakota,Ohio,Oklahoma,Oregon,Pennsylvania,Rhode Island,South Carolina,South Dakota,Tennessee,Texas,Utah,Vermont,Virginia,Washington,West Virginia,Wisconsin,Wyoming';
+}
+
+/**
+ * If ClassiPress has defines a state list, use that
+ * Otherwise, use the default (all 50)
+ */
 function cpc_get_cp_state(){
 	global $wpdb;
 	$sql = $wpdb->prepare( 
@@ -347,7 +366,9 @@ function cpc_get_cp_state(){
 			WHERE `field_name`='cp_state'
 		", $meta_key
 	);
-	return explode(',',$wpdb->get_var( $sql ));
+	$states = $wpdb->get_var( $sql );
+	if( !$states ){ $states = cpc_default_state_list();}
+	return explode(',',$states);
 }
 
 function cpc_broker_directory_shortcode( $atts ) {

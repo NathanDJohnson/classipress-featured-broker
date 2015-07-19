@@ -199,7 +199,9 @@
 			height: 120px;
 			width: 120px;
 		}
-
+		ul.broker-list-broker {
+		  padding-left: 0;
+		}
 	    #broker-directory-wrapper {
   			text-align: justify;
 		 }

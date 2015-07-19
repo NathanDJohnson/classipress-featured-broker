@@ -273,7 +273,7 @@ function cpc_list_brokers( $type, $state = '' ) {
 			),
 			array(
 				'key'     => 'user_state',
-				'value'   => 'Colorado'
+				'value'   => $state
 			)
 		),
 		'orderby' => 'display_name', 
@@ -301,9 +301,13 @@ function cpc_broker_list_shortcode( $atts ) {
 	), $atts );
 
 	$user_query = cpc_list_brokers( $a['type'], $a['state'] );
+	
+	if( !$user_query-> results ){ return; }
 
 	ob_start();
-	?><ul id="broker-list-broker"><?php
+	?>
+	<h2 style="text-align: center; margin-top: 0.5em;"><?php echo $a['type'];?></h2>
+	<ul id="broker-list-broker"><?php
 	if( $user_query->results ){
 		foreach( $user_query->results as $user){
 			$imgURL = cpc_broker_img_url( $user->ID );
@@ -356,16 +360,19 @@ function cpc_broker_directory_shortcode( $atts ) {
 	 ?>
 	 <div id="broker-directory-wrapper">
 	 <h2>Browse Brokers by State</h2>
-	 <ul id="broker-directory">
+	 <form>
+		<select name="URL" onchange="window.location.href=this.form.URL.options[this.form.URL.selectedIndex].value">
+			<option value="">State</option>
 	 <?php	 
 	 foreach( $states as $state ){
-	 	?>
-	 	<li class="broker-directory-<?php echo strtolower(str_replace(' ', '_', $state)); ?>"><a href="<?php if($a['dir']){ echo $a['dir']."/"; }; ?><?php echo strtolower(str_replace(' ', '_', $state)); ?>/"><?php echo $state; ?></a></li>
+	 ?>
+			<option value="<?php if($a['dir']){ echo $a['dir']."/"; }; ?><?php echo strtolower(str_replace(' ', '_', $state)); ?>/"><?php echo $state; ?></option>
 	 <?php
 	 }
-	 ?>
-	 </ul>
-	 </div>
+	 ?>	 
+		</select>
+	</form>
+	</div>
 	 <?php
 	 return ob_get_clean();
 }
@@ -433,6 +440,10 @@ function cpc_get_featured_brokers( $instance ) {
 </ul>
 </div><!-- .broker-wrapper -->
 <?php		
+		}
+		// if odd number, display an invitation to join
+		if ($number % 2 != 0) {
+			// cpc_your_ad_here();
 		}
 ?>
 </div><!-- #classipress-featured-brokers -->

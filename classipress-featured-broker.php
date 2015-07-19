@@ -3,7 +3,7 @@
 Plugin Name: Classipress Featured Broker
 Plugin URI: http://atmoz.org/classipress-featured-broker/
 Description: Adds a couple shortcodes to search user membership packs and adds a widget to display one random user.
-Version: 0.0.1
+Version: 0.1.0
 Author: Nathan Johnson
 Author URI: http://atmoz.org/
 */

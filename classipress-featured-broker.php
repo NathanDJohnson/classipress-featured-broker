@@ -319,7 +319,7 @@ function cpc_broker_list_shortcode( $atts ) {
 			$imgURL = cpc_broker_img_url( $user->ID );
 			?>
 <li class="broker-ind-wrapper<?php if( cpc_is_featured( $user->ID, 'Broker' )){echo ' featured';}?>"> 
-	<a class="broker-list-link" href="<?php echo site_url();?>/author/<?php echo $user->user_nicename;?>/">
+	<a class="broker-list-link" href="<?php echo site_url();?>/<?php if( function_exists('cpc_author_slug') ){ echo cpc_author_slug(); }else{ echo 'author'; } ?>/<?php echo $user->user_nicename;?>/">
 		<div class="broker-list-image">
 			<figure class="broker-content"><img src="<?php echo $imgURL; ?>" class="" alt="" /></figure>
 		</div>

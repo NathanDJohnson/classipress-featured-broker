@@ -449,7 +449,7 @@ function cpc_get_featured_brokers( $instance ) {
 <div class="broker-wrapper">
 <ul class="slide">
 <li>
-<a class="featured-broker-header" href="<?php echo site_url();?>/author/<?php echo $user->user_nicename;?>/">
+<a class="featured-broker-header" href="<?php echo site_url();?>/<?php if( function_exists('cpc_author_slug') ){ echo cpc_author_slug(); }else{ echo 'author'; } ?>/<?php echo $user->user_nicename;?>/">
 <h3 class="broker-header"><?php echo $user->display_name;?></h3>
 <figure class="broker-content">
 <img width="400" height="244" src="<?php echo cpc_broker_img_url( $user->ID ); ?>" class="attachment-bsc_featured" alt="" />

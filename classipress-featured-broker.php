@@ -380,7 +380,6 @@ function cpc_broker_directory_shortcode( $atts ) {
 	 ob_start();
 	 ?>
 	 <div id="broker-directory-wrapper">
-	 <h2>Browse Brokers by State</h2>
 	 <form>
 		<select name="URL" onchange="window.location.href=this.form.URL.options[this.form.URL.selectedIndex].value">
 			<option value="">State</option>

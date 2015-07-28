@@ -320,7 +320,9 @@ function cpc_broker_list_shortcode( $atts ) {
 			<li class="broker-ind-wrapper<?php if( cpc_is_featured( $user->ID, 'Broker' )){echo ' featured';}?>"> 
 				<a class="broker-list-link" href="<?php echo site_url();?>/<?php if( function_exists('cpc_author_slug') ){ echo cpc_author_slug(); }else{ echo 'author'; } ?>/<?php echo $user->user_nicename;?>/">
 				<div class="broker-list-image">
-					<figure class="broker-content"><img src="<?php echo $imgURL; ?>" class="" alt="" /></figure>
+					<figure class="broker-content">
+						<img src="<?php echo $imgURL; ?>" class="" alt="" />
+					</figure>
 				</div>
 				<div class="broker-list-desc">
 					<h3 class="broker-list-header"><?php echo $user->display_name;?></h3>
@@ -453,7 +455,7 @@ function cpc_get_featured_brokers( $instance ) {
 					<a class="featured-broker-header" href="<?php echo site_url();?>/<?php if( function_exists('cpc_author_slug') ){ echo cpc_author_slug(); }else{ echo 'author'; } ?>/<?php echo $user->user_nicename;?>/">
 					<h3 class="broker-header"><?php echo $user->display_name;?></h3>
 						<figure class="broker-content">
-							<img width="400" height="244" src="<?php echo cpc_broker_img_url( $user->ID ); ?>" class="attachment-bsc_featured" alt="" />
+							<img width="225" height="140" src="<?php echo cpc_broker_img_url( $user->ID ); ?>" class="attachment-bsc_featured" alt="" />
 							<figcaption><p><?php echo strip_tags( get_the_author_meta( 'description', $user->ID ) ); ?></p></figcaption>
 						</figure>
 						<p class="broker-tag">Listings: <?php echo cpc_broker_listings( $user->ID )?></p>

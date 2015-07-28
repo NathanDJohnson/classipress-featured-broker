@@ -232,14 +232,15 @@ function cpc_is_featured( $userID, $featuredtype ){
 /**
  * Returns true if ClassiPress is used as a theme or parent theme
  */
-function cpc_using_classipress() {
-
-	// Test if using the ClassiPress theme or child theme
-	$my_theme = wp_get_theme();
-	if( !($my_theme->get( 'Name' ) == 'ClassiPress' || $my_theme->get( 'Template' ) == 'classipress' )){
-		return false;
+if( !function_exists('cpc_using_classipress') ) { 
+	function cpc_using_classipress() {
+		// Test if using the ClassiPress theme or child theme
+		$my_theme = wp_get_theme();
+		if( !($my_theme->get( 'Name' ) == 'ClassiPress' || $my_theme->get( 'Template' ) == 'classipress' )){
+			return false;
+		}
+		return true;
 	}
-	return true;
 }
 
 function cpc_list_brokers( $type, $state = '' ) {
@@ -309,37 +310,37 @@ function cpc_broker_list_shortcode( $atts ) {
 	$user_query = cpc_list_brokers( $a['type'], $a['state'] );
 	?>
 	<?php ob_start(); ?>
-	<h2 style="text-align: center; margin-top: 0.5em;"><?php echo $a['type'];?>s</h2>
-	<?php if( $user_query-> results ) : ?>
-
-<ul class="broker-list-broker">
-	<?php
-	if( $user_query->results ){
-		foreach( $user_query->results as $user){
-			$imgURL = cpc_broker_img_url( $user->ID );
+	<?php if( $user_query->results ) : ?>
+		<h2 style="text-align: center; margin-top: 0.5em;"><?php echo $a['type'];?>s</h2>
+		<ul class="broker-list-broker">
+		<?php
+			foreach( $user_query->results as $user){
+				$imgURL = cpc_broker_img_url( $user->ID );
 			?>
-<li class="broker-ind-wrapper<?php if( cpc_is_featured( $user->ID, 'Broker' )){echo ' featured';}?>"> 
-	<a class="broker-list-link" href="<?php echo site_url();?>/<?php if( function_exists('cpc_author_slug') ){ echo cpc_author_slug(); }else{ echo 'author'; } ?>/<?php echo $user->user_nicename;?>/">
-		<div class="broker-list-image">
-			<figure class="broker-content"><img src="<?php echo $imgURL; ?>" class="" alt="" /></figure>
-		</div>
-		<div class="broker-list-desc">
-			<h3 class="broker-list-header"><?php echo $user->display_name;?></h3>
-			<p><?php echo strip_tags( get_the_author_meta( 'description', $user->ID ) ); ?></p>
-			<?php if( cpc_is_featured( $user->ID, 'Broker' )){ ?>
-			<p class="broker-list-featured"><a href="/featured/">Featured Broker</a></p>
-			<?php }?>
-
-		</div>
-	</a>
-</li><!-- .broker-wrapper -->
+			<li class="broker-ind-wrapper<?php if( cpc_is_featured( $user->ID, 'Broker' )){echo ' featured';}?>"> 
+				<a class="broker-list-link" href="<?php echo site_url();?>/<?php if( function_exists('cpc_author_slug') ){ echo cpc_author_slug(); }else{ echo 'author'; } ?>/<?php echo $user->user_nicename;?>/">
+				<div class="broker-list-image">
+					<figure class="broker-content"><img src="<?php echo $imgURL; ?>" class="" alt="" /></figure>
+				</div>
+				<div class="broker-list-desc">
+					<h3 class="broker-list-header"><?php echo $user->display_name;?></h3>
+					<?php
+						$the_description = strip_tags( get_the_author_meta( 'description', $user->ID ) );
+						if( mb_strlen( $the_description ) >= 250 ){
+							$the_description = mb_substr( $the_description, 0, 250 ).'...';
+						}
+					?>
+				<p><?php echo $the_description; ?></p>
+				<?php if( cpc_is_featured( $user->ID, 'Broker' )) : ?>
+				<p class="broker-list-featured"><a href="/featured/">Featured Broker</a></p>
+				<?php endif; ?>
+				</div>
+				</a>
+			</li><!-- .broker-wrapper -->
 			<?php
 		} // end foreach
-	} // end if
-	?>
-</ul> <!-- .broker-list-broker -->
-	<?php else : ?>
-	<p class="no-results">No <?php echo strtolower( $a['type'] ); ?>s found<?php if($a['state']){echo " in ".$a['state'];}?>.</p>
+		?>
+		</ul> <!-- .broker-list-broker -->
 	<?php endif; ?>
 	<?php return ob_get_clean(); ?>
 <?php
@@ -380,7 +381,8 @@ function cpc_broker_directory_shortcode( $atts ) {
 	 ob_start();
 	 ?>
 	 <div id="broker-directory-wrapper">
-	 <form>
+	 <h2><img class="no-shadow" src="<?php echo plugins_url(); ?>/classipress-featured-broker/BrowseBrokersbyState.png" alt="Browse Brokers by State"></h2>
+	 <form style="margin:0 auto; max-width:225px;">
 		<select name="URL" onchange="window.location.href=this.form.URL.options[this.form.URL.selectedIndex].value">
 			<option value="">State</option>
 	 <?php	 
@@ -440,26 +442,26 @@ function cpc_get_featured_brokers( $instance ) {
 		shuffle( $random );
 		if( $number > count( $random ) ) { $number = count( $random ); }
 		$random = array_slice( $random, 0, $number );
-?>		
-<div id="classipress-featured-brokers">	
-<?php
+	?>		
+	<div id="classipress-featured-brokers">	
+	<?php
 		foreach( $random as $user ){
-?>
-<div class="broker-wrapper">
-<ul class="slide">
-<li>
-<a class="featured-broker-header" href="<?php echo site_url();?>/<?php if( function_exists('cpc_author_slug') ){ echo cpc_author_slug(); }else{ echo 'author'; } ?>/<?php echo $user->user_nicename;?>/">
-<h3 class="broker-header"><?php echo $user->display_name;?></h3>
-<figure class="broker-content">
-<img width="400" height="244" src="<?php echo cpc_broker_img_url( $user->ID ); ?>" class="attachment-bsc_featured" alt="" />
-<figcaption><p><?php echo strip_tags( get_the_author_meta( 'description', $user->ID ) ); ?></p></figcaption>
-</figure>
-<p class="broker-tag">Listings: <?php echo cpc_broker_listings( $user->ID )?></p>
-</a>
-</li>            
-</ul>
-</div><!-- .broker-wrapper -->
-<?php		
+	?>
+		<div class="broker-wrapper">
+			<ul class="slide">
+				<li>
+					<a class="featured-broker-header" href="<?php echo site_url();?>/<?php if( function_exists('cpc_author_slug') ){ echo cpc_author_slug(); }else{ echo 'author'; } ?>/<?php echo $user->user_nicename;?>/">
+					<h3 class="broker-header"><?php echo $user->display_name;?></h3>
+						<figure class="broker-content">
+							<img width="400" height="244" src="<?php echo cpc_broker_img_url( $user->ID ); ?>" class="attachment-bsc_featured" alt="" />
+							<figcaption><p><?php echo strip_tags( get_the_author_meta( 'description', $user->ID ) ); ?></p></figcaption>
+						</figure>
+						<p class="broker-tag">Listings: <?php echo cpc_broker_listings( $user->ID )?></p>
+					</a>
+				</li>            
+			</ul>
+		</div><!-- .broker-wrapper -->
+	<?php		
 		}
 		// if odd number, display an invitation to join
 		if ($number % 2 != 0) {

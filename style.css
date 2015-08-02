@@ -97,17 +97,13 @@
 	float: left;
 	width: auto;
 	height: 38px;
-	
 	background-color: #979797;
 	-webkit-border-radius: 4px;
 	-moz-border-radius: 4px;
-	border-radius: 4px;
-	
+	border-radius: 4px;	
 	position: relative;
-	
 	color: white;
 	font-weight: 300;
-	font-family: 'Source Sans Pro', sans-serif;
 	font-size: 22px;
 	line-height: 38px;
 

@@ -456,7 +456,13 @@ function cpc_get_featured_brokers( $instance ) {
 					<h3 class="broker-header"><?php echo $user->display_name;?></h3>
 						<figure class="broker-content">
 							<img width="225" height="140" src="<?php echo cpc_broker_img_url( $user->ID ); ?>" class="attachment-bsc_featured" alt="" />
-							<figcaption><p><?php echo strip_tags( get_the_author_meta( 'description', $user->ID ) ); ?></p></figcaption>
+							<?php 
+								$the_description = strip_tags( get_the_author_meta( 'description', $user->ID ) );
+								if( mb_strlen( $the_description ) >= 250 ){
+									$the_description = mb_substr( $the_description, 0, 250 ).'...';
+								}
+							?>
+							<figcaption><p><?php echo $the_description; ?></p></figcaption>
 						</figure>
 						<p class="broker-tag">Listings: <?php echo cpc_broker_listings( $user->ID )?></p>
 					</a>
